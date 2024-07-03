@@ -1,0 +1,142 @@
+import java.util.*;
+
+abstract class Vehicle {
+    String vehicleID;
+    String vehicleType;
+
+    public abstract void park();
+    public abstract void leave();
+}
+
+class Motorcycle extends Vehicle {
+    public Motorcycle(String id) {
+        vehicleID = id;
+        vehicleType = "Motorcycle";
+    }
+
+    @Override
+    public void park() {
+        System.out.println("Motorcycle parked.");
+    }
+
+    @Override
+    public void leave() {
+        System.out.println("Motorcycle left.");
+    }
+}
+
+class Car extends Vehicle {
+    public Car(String id) {
+        vehicleID = id;
+        vehicleType = "Car";
+    }
+
+    @Override
+    public void park() {
+        System.out.println("Car parked.");
+    }
+
+    @Override
+    public void leave() {
+        System.out.println("Car left.");
+    }
+}
+
+class Bus extends Vehicle {
+    public Bus(String id) {
+        vehicleID = id;
+        vehicleType = "Bus";
+    }
+
+    @Override
+    public void park() {
+        System.out.println("Bus parked.");
+    }
+
+    @Override
+    public void leave() {
+        System.out.println("Bus left.");
+    }
+}
+
+class Spot {
+    boolean isOccupied;
+    Vehicle vehicle;
+
+    public Spot() {
+        isOccupied = false;
+        vehicle = null;
+    }
+
+    public boolean park(Vehicle v) {
+        if (!isOccupied) {
+            vehicle = v;
+            isOccupied = true;
+            vehicle.park();
+            return true;
+        }
+        return false;
+    }
+
+    public void leave() {
+        if (isOccupied) {
+            vehicle.leave();
+            isOccupied = false;
+            vehicle = null;
+        }
+    }
+}
+
+class ParkingLot {
+    List<List<Spot>> levels;
+
+    public ParkingLot(int numLevels, int numSpotsPerLevel) {
+        levels = new ArrayList<>();
+        for (int i = 0; i < numLevels; i++) {
+            List<Spot> level = new ArrayList<>();
+            for (int j = 0; j < numSpotsPerLevel; j++) {
+                level.add(new Spot());
+            }
+            levels.add(level);
+        }
+    }
+
+    public boolean parkVehicle(Vehicle vehicle) {
+        for (List<Spot> level : levels) {
+            for (Spot spot : level) {
+                if (spot.park(vehicle)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void removeVehicle(Vehicle vehicle) {
+        for (List<Spot> level : levels) {
+            for (Spot spot : level) {
+                if (spot.vehicle == vehicle) {
+                    spot.leave();
+                    return;
+                }
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ParkingLot lot = new ParkingLot(3, 10);
+        Vehicle bike = new Motorcycle("M1");
+        Vehicle car = new Car("C1");
+        Vehicle bus = new Bus("B1");
+
+        lot.parkVehicle(bike);
+        lot.parkVehicle(car);
+        lot.parkVehicle(bus);
+
+        lot.removeVehicle(car);
+        lot.removeVehicle(bike);
+        lot.removeVehicle(bus);
+    }
+}
