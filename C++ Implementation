@@ -1,0 +1,124 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+class Vehicle {
+public:
+    std::string vehicleID;
+    std::string vehicleType;
+    virtual void park() = 0;
+    virtual void leave() = 0;
+};
+
+class Motorcycle : public Vehicle {
+public:
+    Motorcycle(std::string id) {
+        vehicleID = id;
+        vehicleType = "Motorcycle";
+    }
+    void park() override {
+        std::cout << "Motorcycle parked.\n";
+    }
+    void leave() override {
+        std::cout << "Motorcycle left.\n";
+    }
+};
+
+class Car : public Vehicle {
+public:
+    Car(std::string id) {
+        vehicleID = id;
+        vehicleType = "Car";
+    }
+    void park() override {
+        std::cout << "Car parked.\n";
+    }
+    void leave() override {
+        std::cout << "Car left.\n";
+    }
+};
+
+class Bus : public Vehicle {
+public:
+    Bus(std::string id) {
+        vehicleID = id;
+        vehicleType = "Bus";
+    }
+    void park() override {
+        std::cout << "Bus parked.\n";
+    }
+    void leave() override {
+        std::cout << "Bus left.\n";
+    }
+};
+
+class Spot {
+public:
+    bool isOccupied;
+    Vehicle* vehicle;
+    Spot() : isOccupied(false), vehicle(nullptr) {}
+    bool park(Vehicle* v) {
+        if (!isOccupied) {
+            vehicle = v;
+            isOccupied = true;
+            vehicle->park();
+            return true;
+        }
+        return false;
+    }
+    void leave() {
+        if (isOccupied) {
+            vehicle->leave();
+            isOccupied = false;
+            vehicle = nullptr;
+        }
+    }
+};
+
+class ParkingLot {
+public:
+    std::vector<std::vector<Spot>> levels;
+    ParkingLot(int numLevels, int numSpotsPerLevel) {
+        levels.resize(numLevels, std::vector<Spot>(numSpotsPerLevel));
+    }
+    bool parkVehicle(Vehicle* vehicle) {
+        for (auto& level : levels) {
+            for (auto& spot : level) {
+                if (spot.park(vehicle)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    void removeVehicle(Vehicle* vehicle) {
+        for (auto& level : levels) {
+            for (auto& spot : level) {
+                if (spot.vehicle == vehicle) {
+                    spot.leave();
+                    return;
+                }
+            }
+        }
+    }
+};
+
+int main() {
+    ParkingLot lot(3, 10);
+    Vehicle* bike = new Motorcycle("M1");
+    Vehicle* car = new Car("C1");
+    Vehicle* bus = new Bus("B1");
+
+    lot.parkVehicle(bike);
+    lot.parkVehicle(car);
+    lot.parkVehicle(bus);
+
+    lot.removeVehicle(car);
+    lot.removeVehicle(bike);
+    lot.removeVehicle(bus);
+
+    delete bike;
+    delete car;
+    delete bus;
+    return 0;
+}
